@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>학생부종합전형 생활기록부 평가표 — 3역량·사정관 사례·과목 이수 체크</title>
+  <meta name="description" content="학생부종합전형 생활기록부 평가표(학업·진로·공동체), 대학별 가중치 비교, 업로드한 가이드북을 바탕으로 한 역량별 사정관 평가사례 10선 포함.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 모바일 가독성 보강 */
+    .card { border-radius: 1rem; border: 1px solid rgb(229 231 235); background: white; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .chip { border-radius: 0.75rem; padding: .35rem .6rem; font-weight: 700; }
+    .case-card ul li { margin-left: 1rem; list-style: disc; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <div class="max-w-7xl mx-auto p-6">
+    <header class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-700 to-emerald-600 bg-clip-text text-transparent">
+        학생부종합전형 생활기록부 평가표
+      </h1>
+      <p class="text-[13px] text-gray-700 mt-2 leading-relaxed">
+        <span class="inline-block px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 mr-1">근거</span>
+        2026학년도 학생부종합전형 가이드북(서울대·연세대·고려대·서강대·성균관대·한양대·중앙대·경희대·한국외대·서울시립대·건국대·동국대·홍익대·국민대·숭실대·세종대·단국대·서울과학기술대·이화여대·광운대 등) 업로드본 요약 반영.
+        점수(1~5) 입력 → <strong>대학 프로파일 가중치</strong>로 100점 환산. 각 카드에는 <strong>세부 기준·루브릭</strong>과
+        <strong>입학사정관 평가사례 10선</strong>, <strong>가이드북 포인트</strong>를 함께 기록할 수 있습니다.
+        또한 <strong>경희대 자연계열(2022 개정)</strong> 권장 과목을 요약한 <em>전공 과목 이수 체크</em> UI를 제공합니다.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 입력 패널 -->
+      <section class="lg:col-span-2 card p-5">
+        <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between mb-4">
+          <div>
+            <label for="profileSelect" class="block text-sm font-medium text-gray-700">대학 프로파일 선택</label>
+            <select id="profileSelect" class="mt-1 w-64 rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+            <p id="weightWarn" class="text-xs text-red-600 mt-1 hidden">선택한 프로파일의 가중치 합계가 100%가 아닙니다. 가중치를 수정해 주세요.</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button id="toggleWeights" class="px-3 py-2 text-sm rounded-xl bg-gray-100 hover:bg-gray-200">가중치 편집</button>
+            <button id="btnSave" class="px-3 py-2 text-sm rounded-xl bg-gray-100 hover:bg-gray-200">입력 저장</button>
+            <button id="btnLoad" class="px-3 py-2 text-sm rounded-xl bg-gray-100 hover:bg-gray-200">불러오기</button>
+            <button id="btnReset" class="px-3 py-2 text-sm rounded-xl bg-gray-100 hover:bg-gray-200">초기화</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 학업역량 -->
+          <div class="card p-4">
+            <h2 class="font-semibold text-lg mb-2">Ⅰ. 학업역량</h2>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium">학업성취도</label>
+                <select id="acad1" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">학업태도</label>
+                <select id="acad2" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">탐구력</label>
+                <select id="acad3" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+
+              <div class="mt-2 text-xs bg-gray-50 rounded-lg p-3">
+                <div class="font-semibold text-gray-700">세부 기준 & 루브릭</div>
+                <div class="grid md:grid-cols-2 gap-4 mt-2">
+                  <ul class="list-disc ml-4 text-gray-600">
+                    <li><strong>학업성취도</strong>: 등급·원점수·표준편차·수강자수, 과목 난이도/단위, 학기 추세</li>
+                    <li><strong>학업태도</strong>: 수업 참여, 과제 충실, 피드백 반영, 자기주도 학습</li>
+                    <li><strong>탐구력</strong>: 주제 타당성, 설계(가설·통제·반복), 분석·해석, 한계 성찰·확장</li>
+                  </ul>
+                  <ul class="list-disc ml-4 text-gray-600 text-[13px]">
+                    <li>5점: 상위 성취(심화 포함)+적극 태도+정밀 탐구/산출물</li>
+                    <li>4점: 우수 성취+안정 태도+체계 탐구</li>
+                    <li>3점: 보통 성취+기본 태도+핵심 절차 충족</li>
+                    <li>2점: 기복/핵심 취약+소극 태도+근거 부족</li>
+                    <li>1점: 전반 미흡</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 사례 항상 펼쳐진 카드 -->
+              <div class="case-card mt-3 text-[12px] rounded-xl border border-indigo-200 bg-indigo-50 p-3">
+                <div class="font-semibold text-indigo-900 mb-1">입학사정관 평가사례 — 학업(10선)</div>
+                <ul class="text-gray-800 space-y-1">
+                  <li>과탐 세특에서 <em>문제 인식→자료 분석→한계 설정→대안</em> 2차 보고서 개선, 후속 실험 → 탐구력 5점</li>
+                  <li><em>미적분Ⅱ</em> 표준편차 큰 반에서 상위 원점수 유지, <em>기하</em> 추가 이수 → 성취도 4~5점</li>
+                  <li>국어/사회 세특에 <em>질문·토론·발표·피드백</em> 반복 기록 → 학업태도 4~5점</li>
+                  <li>소인수 심화 과목에서 상향 성취, 보고서·발표 완성도 ↑ → 성취도 4점</li>
+                  <li>단위수 큰 과목에서 <em>지속 A</em>, 공통→일반→진선 심화 경로 → 성취도 5점</li>
+                  <li>일시적 하락 후 다음 학기 <em>회복 추세</em>+개선 기록 구체 → 태도 4점</li>
+                  <li>수행평가 <em>초안→개정본</em> 비교로 자기주도 개선 근거 명확 → 태도 4~5점</li>
+                  <li>전공 관련 <em>심화 독서</em>를 교과 과제와 연결해 비판적 에세이 → 탐구력 4점</li>
+                  <li><em>통합과학→물리Ⅰ→물리Ⅱ</em> 심화 이수, 실험 설계·오차 분석 서술 → 탐구력 4~5점</li>
+                  <li>출결 우수·마감 준수 등 기본 태도 안정적 → 태도 4점</li>
+                </ul>
+              </div>
+
+              <div class="mt-2 grid md:grid-cols-2 gap-2">
+                <textarea id="acadNote" placeholder="근거 기록(세특 인용, 과목·학기, 활동명 등)" class="w-full rounded-xl border-gray-200 p-2 text-sm" rows="2"></textarea>
+                <div class="space-y-2">
+                  <textarea id="acadGuide" placeholder="대학 가이드북 평가 포인트(요약 기록)" class="w-full rounded-xl border-amber-200 p-2 text-sm bg-amber-50" rows="2"></textarea>
+                  <button data-fill="A" class="btnFill text-xs px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200">선택 대학 기준 불러오기</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 진로역량 -->
+          <div class="card p-4">
+            <h2 class="font-semibold text-lg mb-2">Ⅱ. 진로역량</h2>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium">전공(계열) 관련 교과 이수 노력</label>
+                <select id="career1" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">전공(계열) 관련 교과 성취도</label>
+                <select id="career2" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">진로 탐색 활동과 경험</label>
+                <select id="career3" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+
+              <div class="mt-2 text-xs bg-gray-50 rounded-lg p-3">
+                <div class="font-semibold text-gray-700">세부 기준 & 루브릭</div>
+                <div class="grid md:grid-cols-2 gap-4 mt-2">
+                  <ul class="list-disc ml-4 text-gray-600">
+                    <li><strong>교과 이수 노력</strong>: 전공 필수·권장 과목 단계적 이수, 난이도·단위 고려</li>
+                    <li><strong>전공 교과 성취</strong>: 전공 연계 교과 성취 추세, 심화 과목 성취</li>
+                    <li><strong>진로 탐색</strong>: 동아리·탐구·프로젝트·독서의 지속성·확장성·산출물</li>
+                  </ul>
+                  <ul class="list-disc ml-4 text-gray-600 text-[13px]">
+                    <li>5점: 권장 이수 충족+심화, 성취 상위권, 전공 탐구의 심화·확장 분명</li>
+                    <li>4점: 권장 이수 대체로 충족, 성취 우수, 탐색-심화 연결</li>
+                    <li>3점: 기본 이수, 성취 안정, 탐색 활동 존재</li>
+                    <li>2점: 이수·성취 기복, 탐색 지속성·연계성 부족</li>
+                    <li>1점: 전공 연계 근거 부족</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 사례 항상 펼쳐진 카드 -->
+              <div class="case-card mt-3 text-[12px] rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                <div class="font-semibold text-emerald-900 mb-1">입학사정관 평가사례 — 진로(10선)</div>
+                <ul class="text-gray-800 space-y-1">
+                  <li>기계공 희망: <em>물리Ⅱ·미적분Ⅱ</em> 연계 이수 + <em>토크-속도 곡선</em> 실험 보고서 → 전공적합 5점</li>
+                  <li>컴퓨터 희망: <em>정보/프로그래밍</em> 산출물(웹앱/알고리즘) + 교내 발표 → 탐색 4~5점</li>
+                  <li>생명과학 희망: <em>생명과학Ⅱ</em> 선택 + 관찰 기록, 탐방 후속 가설 설정 → 심화 4점</li>
+                  <li>경영 희망: 동아리 <em>시장 분석 리포트</em> + 경제 토론 → 탐색 4점</li>
+                  <li>건축 희망: 미술·수학 연동 <em>모형 설계</em> 프로젝트, 전시 산출물 → 적합 4점</li>
+                  <li>국제/영문 희망: 전공 <em>심화 독서</em>, 에세이, 영어 PT → 탐색 4점</li>
+                  <li>성취 하락 후 회복 + 심화 과목 선택 기록 → 전공 교과 성취 3~4점</li>
+                  <li><em>권장 과목</em> 충족률 높고 학년별 이수 경로 연속성 확인 → 이수 노력 4~5점</li>
+                  <li>교내·지역 <em>진로체험/멘토링</em> 보고서·성찰, 다음 활동 기획 → 탐색 4점</li>
+                  <li>전공 주제 <em>독서→보고서→발표</em>로 이어지는 산출물 연결 다수 → 탐색 5점</li>
+                </ul>
+              </div>
+
+              <div class="mt-2 grid md:grid-cols-2 gap-2">
+                <textarea id="careerNote" placeholder="근거 기록(세특 인용, 진로활동·동아리·프로젝트 등)" class="w-full rounded-xl border-gray-200 p-2 text-sm" rows="2"></textarea>
+                <div class="space-y-2">
+                  <textarea id="careerGuide" placeholder="대학 가이드북 평가 포인트(요약 기록)" class="w-full rounded-xl border-amber-200 p-2 text-sm bg-amber-50" rows="2"></textarea>
+                  <button data-fill="R" class="btnFill text-xs px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200">선택 대학 기준 불러오기</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 공동체역량 -->
+          <div class="card p-4 md:col-span-2">
+            <h2 class="font-semibold text-lg mb-2">Ⅲ. 공동체역량</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium">협업·소통능력</label>
+                <select id="comm1" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">나눔·배려</label>
+                <select id="comm2" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">성실성·규칙준수</label>
+                <select id="comm3" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium">리더십</label>
+                <select id="comm4" class="mt-1 w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></select>
+              </div>
+            </div>
+
+            <div class="mt-2 text-xs bg-gray-50 rounded-lg p-3">
+              <div class="font-semibold text-gray-700">세부 기준 & 루브릭</div>
+              <div class="grid md:grid-cols-2 gap-4 mt-2">
+                <ul class="list-disc ml-4 text-gray-600">
+                  <li><strong>협업·소통</strong>: 역할 분담, 갈등 조정, 공동과제 완수</li>
+                  <li><strong>나눔·배려</strong>: 공동체 기여의 의미와 지속성</li>
+                  <li><strong>성실·규칙</strong>: 출결·생활 기록의 안정성, 책임감</li>
+                  <li><strong>리더십</strong>: 목표 달성 위한 계획·실행, 구성원 참여 유도</li>
+                </ul>
+                <ul class="list-disc ml-4 text-gray-600 text-[13px]">
+                  <li>5점: 다양한 상황에서 모범·주도, 공동체 성과 창출</li>
+                  <li>4점: 협업 원활, 책임감·배려가 확연</li>
+                  <li>3점: 기본 태도 양호, 협업 참여</li>
+                  <li>2점: 기여·책임의 일관성 부족</li>
+                  <li>1점: 협업·성실성 근거 부족/결함</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- 사례 항상 펼쳐진 카드 -->
+            <div class="case-card mt-3 text-[12px] rounded-xl border border-rose-200 bg-rose-50 p-3">
+              <div class="font-semibold text-rose-900 mb-1">입학사정관 평가사례 — 공동체(10선)</div>
+              <ul class="text-gray-800 space-y-1">
+                <li>팀 프로젝트 역할 충돌 중재, 일정·역할 재조정 → 협업·소통 5점</li>
+                <li>학급 회의 의장으로 안건 정리·합의 도출, 회의록 작성 → 리더십 4~5점</li>
+                <li>학습 튜터링 정기 진행, 피드백 설문 수집 → 나눔·배려 4점</li>
+                <li>학생회 행사 기획·예산 집행·결과 보고까지 책임 → 리더십 5점</li>
+                <li>학교 환경개선 봉사 정기 기획·실행, 후속 개선안 기록 → 나눔·배려 4~5점</li>
+                <li>무단 지각/결과 없음, 과제 마감 준수 기록 반복 → 성실성·규칙준수 4~5점</li>
+                <li>갈등 상황에서 <em>근거 기반 의사소통</em>으로 팀 성과 향상 → 협업 4~5점</li>
+                <li>안전/청결 캠페인 자체 제작·홍보, 참여율 개선 → 공동체 기여 4점</li>
+                <li>체육대회·프로젝트 등에서 페어플레이·역할 교대 사례 기록 → 소통·배려 4점</li>
+                <li>지역사회 연계 봉사 프로젝트를 <em>계획→실행→피드백</em>으로 운영 → 리더십 5점</li>
+              </ul>
+            </div>
+
+            <div class="mt-2 grid md:grid-cols-2 gap-2">
+              <textarea id="commNote" placeholder="근거 기록(행동특성 종합의견, 봉사·창체·출결 근거 등)" class="w-full rounded-xl border-gray-200 p-2 text-sm" rows="2"></textarea>
+              <div class="space-y-2">
+                <textarea id="commGuide" placeholder="대학 가이드북 평가 포인트(요약 기록)" class="w-full rounded-xl border-amber-200 p-2 text-sm bg-amber-50" rows="2"></textarea>
+                <button data-fill="C" class="btnFill text-xs px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200">선택 대학 기준 불러오기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 전공 과목 이수 체크 (경희대 자연계열 참고) -->
+        <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold">전공 과목 이수 체크 — 경희대 자연계열 가이드 참고(2022 개정)</h3>
+            <div class="text-xs text-gray-600">빨간 항목=핵심, 파란 항목=권장 (요약)</div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-3">
+            <div>
+              <label class="text-sm">전공 분야 선택</label>
+              <select id="khMajor" class="mt-1 w-full rounded-xl border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"></select>
+            </div>
+            <div>
+              <label class="text-sm">이수 과목 체크</label>
+              <div id="khSubjects" class="mt-1 flex flex-wrap gap-2"></div>
+              <p id="khProgress" class="mt-2 text-xs text-gray-700"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 가중치 편집 패널 -->
+        <div id="weightsPanel" class="mt-5 hidden">
+          <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold">가중치 편집 (합계 100%)</h3>
+              <div class="text-xs text-gray-600">값은 % 단위로 입력하세요.</div>
+            </div>
+            <div class="overflow-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="bg-indigo-100">
+                    <th class="p-2 text-left">프로파일(대학/전형)</th>
+                    <th class="p-2 text-center">학업역량</th>
+                    <th class="p-2 text-center">진로역량</th>
+                    <th class="p-2 text-center">공동체역량</th>
+                    <th class="p-2 text-center">합계</th>
+                  </tr>
+                </thead>
+                <tbody id="weightsBody"></tbody>
+              </table>
+            </div>
+            <div class="mt-3 flex justify-end gap-2">
+              <button id="btnWeightsSave" class="px-3 py-2 text-sm rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">가중치 저장</button>
+              <button id="btnWeightsClose" class="px-3 py-2 text-sm rounded-xl bg-gray-200 hover:bg-gray-300">닫기</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 결과 패널 -->
+      <aside class="card p-5 space-y-4">
+        <!-- 상단 고정: 추천 순위 & 액션 버튼 -->
+        <div class="sticky top-4 z-10 border rounded-2xl bg-emerald-50/70 border-emerald-200 p-4 shadow-sm">
+          <h2 class="font-semibold text-lg">지원 추천 순위(상위 5)</h2>
+          <ol id="top5" class="mt-2 list-decimal ml-5 text-sm text-gray-800 space-y-1"></ol>
+          <div class="mt-3 flex gap-2">
+            <button id="btnExportCSV" class="px-3 py-2 text-sm rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">CSV 내보내기</button>
+            <button id="btnPrint" class="px-3 py-2 text-sm rounded-xl bg-gray-100 hover:bg-gray-200">인쇄/저장</button>
+          </div>
+        </div>
+
+        <!-- 요약 정보(강조 스타일 적용) -->
+        <div>
+          <h2 class="font-semibold text-lg">선택 프로파일 요약</h2>
+          <div id="weightsSummary" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2"></div>
+        </div>
+
+        <div>
+          <h2 class="font-semibold text-lg">영역별 평균</h2>
+          <div id="areas" class="mt-2 space-y-3"></div>
+        </div>
+
+        <div class="border-t pt-4">
+          <h2 class="font-semibold text-lg">프로파일별 총점 비교</h2>
+          <div class="overflow-auto mt-2">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="p-2 text-left">프로파일</th>
+                  <th class="p-2 text-center">총점(100)</th>
+                </tr>
+              </thead>
+              <tbody id="compareBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="mt-8 text-xs text-gray-500">
+      <p>※ 가중치는 각 대학 2026 가이드북 공개 요소를 3영역으로 합리적으로 매핑한 템플릿입니다. 전형/학과에 따라 조정하세요. 과목 이수 체크는 경희대 자연계열 권장과목 표(2022 개정) <em>요약</em> 기반으로 제공됩니다.</p>
+    </footer>
+  </div>
+
+  <script>
+    // ===== 대학별 가중치(3영역) =====
+    const profiles = {
+      "서울대": { A: 40, R: 45, C: 15 },
+      "연세대": { A: 30, R: 55, C: 15 },
+      "고려대": { A: 35, R: 45, C: 20 },
+      "서강대": { A: 35, R: 50, C: 15 },
+      "성균관대": { A: 30, R: 55, C: 15 },
+      "한양대": { A: 30, R: 55, C: 15 },
+      "중앙대(융합형)": { A: 50, R: 30, C: 20 },
+      "중앙대(탐구형)": { A: 40, R: 50, C: 10 },
+      "경희대": { A: 40, R: 40, C: 20 },
+      "한국외대": { A: 35, R: 50, C: 15 },
+      "서울시립대": { A: 30, R: 50, C: 20 },
+      "건국대": { A: 30, R: 50, C: 20 },
+      "동국대": { A: 30, R: 50, C: 20 },
+      "홍익대": { A: 30, R: 55, C: 15 },
+      "국민대": { A: 30, R: 50, C: 20 },
+      "숭실대": { A: 30, R: 50, C: 20 },
+      "세종대": { A: 30, R: 50, C: 20 },
+      "단국대": { A: 30, R: 50, C: 20 },
+      "서울과학기술대": { A: 35, R: 50, C: 15 },
+      "이화여대": { A: 30, R: 40, C: 30 },
+      "광운대": { A: 35, R: 50, C: 15 }
+    };
+
+    const areaMeta = [
+      { key: 'A', name: '학업역량', inputs: ['acad1', 'acad2', 'acad3'] },
+      { key: 'R', name: '진로역량', inputs: ['career1', 'career2', 'career3'] },
+      { key: 'C', name: '공동체역량', inputs: ['comm1', 'comm2', 'comm3', 'comm4'] },
+    ];
+
+    // ===== 경희대 자연계열 권장 과목(요약) =====
+    const khRecs = {
+      "수학/응용수학": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하'], rec: [] },
+      "컴퓨터(소프트웨어·인공지능·컴퓨터공)": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','인공지능 수학'], rec: ['정보'] },
+      "산업/산업경영공": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하'], rec: [] },
+      "물리/응용물리": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','물리학Ⅰ'], rec: ['물리학Ⅱ','역학과 에너지','전자기와 양자'] },
+      "기계": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','물리학Ⅰ'], rec: ['물리학Ⅱ','역학과 에너지','전자기와 양자'] },
+      "전기·전자": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','물리학Ⅰ'], rec: ['물리학Ⅱ','역학과 에너지','전자기와 양자'] },
+      "건설/건축": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','물리학Ⅰ'], rec: ['지구과학','생활과 과학'] },
+      "화학/응용화학": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','화학Ⅰ'], rec: ['화학Ⅱ','화학 반응의 세계'] },
+      "재료·신소재·에너지": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','기하','화학Ⅰ'], rec: ['화학Ⅱ','물질과 에너지','전자기와 양자'] },
+      "생명과학/환경/식품/농림": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','생명과학Ⅰ'], rec: ['생명과학Ⅱ','화학(기초)','환경과학 관련 융합과목'] },
+      "천문·지구/우주": { core: ['미적분Ⅰ','확률과 통계','미적분Ⅱ','지구과학Ⅰ'], rec: ['지구과학Ⅱ','역학과 에너지','전자기와 양자'] }
+    };
+
+    // ===== 유틸 =====
+    const byId = (id) => document.getElementById(id);
+    const avg = (arr) => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    const nonEmptyNumbers = (ids) => ids.map(id => parseInt(byId(id).value,10)).filter(v => !isNaN(v));
+    const sumWeights = (w) => w.A + w.R + w.C;
+
+    function buildScoreOptions(sel){ sel.innerHTML = '<option value="">—</option>'+[1,2,3,4,5].map(v=>`<option value="${v}">${v}</option>`).join(''); }
+
+    // 요약을 큰 칩+큰 숫자로 렌더링
+    function renderWeightsSummary(name){
+      const w = profiles[name];
+      const wrap = byId('weightsSummary'); wrap.innerHTML = '';
+      const items = [
+        {k:'A', label:'학업역량', color:'indigo', val:w.A},
+        {k:'R', label:'진로역량', color:'emerald', val:w.R},
+        {k:'C', label:'공동체역량', color:'rose', val:w.C},
+      ];
+      items.forEach(it=>{
+        const div = document.createElement('div');
+        div.className = `flex flex-col items-center justify-center rounded-2xl border px-4 py-3 bg-${it.color}-50 border-${it.color}-200`;
+        div.innerHTML = `<div class="text-sm font-semibold text-${it.color}-800">${it.label}</div>
+                         <div class="text-2xl font-extrabold text-${it.color}-700 mt-1">${it.val}<span class="text-sm font-semibold ml-0.5">%</span></div>`;
+        wrap.appendChild(div);
+      });
+      byId('weightWarn').classList.toggle('hidden', sumWeights(w)===100);
+    }
+
+    function renderAreas(){
+      const wrap = byId('areas'); wrap.innerHTML='';
+      areaMeta.forEach(meta=>{
+        const a = avg(nonEmptyNumbers(meta.inputs)); const pct = Math.round((a/5)*100);
+        const barColor = meta.key==='A' ? 'bg-indigo-600' : (meta.key==='R' ? 'bg-emerald-600' : 'bg-rose-600');
+        const row = document.createElement('div');
+        row.innerHTML = `<div class="flex items-center justify-between text-sm">
+            <span>${meta.name}</span><span class="font-medium">평균 ${a.toFixed(2)} / 5</span></div>
+            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden mt-1"><div class="h-2 ${barColor}" style="width:${pct}%"></div></div>`;
+        wrap.appendChild(row);
+      });
+    }
+
+    function calcSelectedTotal(){
+      const w = profiles[byId('profileSelect').value]; let total=0;
+      areaMeta.forEach(meta=>{ total += (avg(nonEmptyNumbers(meta.inputs))/5) * (w[meta.key]/100); });
+      return Math.round(total*100);
+    }
+
+    function renderCompareAll(){
+      const arr = Object.entries(profiles).map(([name,w])=>{
+        let t=0; areaMeta.forEach(meta=>{ t += (avg(nonEmptyNumbers(meta.inputs))/5)*(w[meta.key]/100); });
+        return {name, score: Math.round(t*100)}; });
+      arr.sort((a,b)=>b.score-a.score);
+      const tbody = byId('compareBody'); tbody.innerHTML='';
+      arr.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2">${i+1}. ${r.name}</td><td class="p-2 text-center font-semibold">${r.score}</td>`; tbody.appendChild(tr); });
+      const top = arr.slice(0,5); const ol = byId('top5'); if(ol){ ol.innerHTML = top.map((r,i)=>`<li><span class="font-semibold">${r.name}</span> — ${r.score}점</li>`).join(''); }
+    }
+
+    function recalcAll(){ renderAreas(); renderWeightsSummary(byId('profileSelect').value); calcSelectedTotal(); renderCompareAll(); }
+
+    // 가중치 편집
+    function buildWeightsEditor(){
+      const tbody = byId('weightsBody'); tbody.innerHTML='';
+      Object.entries(profiles).forEach(([name,w])=>{
+        const tr=document.createElement('tr'); tr.className='border-b';
+        tr.innerHTML=`<td class="p-2">${name}</td>
+        <td class="p-1 text-center"><input type="number" class="w-20 text-center rounded-lg border-gray-300" value="${w.A}" min="0" max="100" step="1" data-name="${name}" data-k="A"></td>
+        <td class="p-1 text-center"><input type="number" class="w-20 text-center rounded-lg border-gray-300" value="${w.R}" min="0" max="100" step="1" data-name="${name}" data-k="R"></td>
+        <td class="p-1 text-center"><input type="number" class="w-20 text-center rounded-lg border-gray-300" value="${w.C}" min="0" max="100" step="1" data-name="${name}" data-k="C"></td>
+        <td class="p-2 text-center text-xs text-gray-600" data-sum="${name}">${w.A+w.R+w.C}%</td>`;
+        tbody.appendChild(tr);
+      });
+      tbody.querySelectorAll('input').forEach(inp=>{
+        inp.addEventListener('input',e=>{
+          const nm=e.target.dataset.name, k=e.target.dataset.k; let v=parseInt(e.target.value,10); if(isNaN(v)) v=0; v=Math.max(0,Math.min(100,v));
+          e.target.value=v; profiles[nm][k]=v; tbody.querySelector(`[data-sum="${nm}"]`).textContent=(profiles[nm].A+profiles[nm].R+profiles[nm].C)+'%';
+          recalcAll();
+        });
+      });
+    }
+
+    // CSV 내보내기
+    function exportCSV(){
+      const sel = byId('profileSelect').value; const selW = profiles[sel];
+      const rows = [];
+      rows.push(['선택 프로파일', sel]);
+      rows.push(['학업(%)',selW.A,'진로(%)',selW.R,'공동체(%)',selW.C]);
+      rows.push([]); rows.push(['영역','항목','점수(1~5)']);
+      const get=(id)=>byId(id).value||'';
+      rows.push(['학업','학업성취도',get('acad1')]); rows.push(['학업','학업태도',get('acad2')]); rows.push(['학업','탐구력',get('acad3')]);
+      rows.push(['진로','교과 이수 노력',get('career1')]); rows.push(['진로','전공 교과 성취',get('career2')]); rows.push(['진로','진로 탐색',get('career3')]);
+      rows.push(['공동체','협업·소통',get('comm1')]); rows.push(['공동체','나눔·배려',get('comm2')]); rows.push(['공동체','성실·규칙',get('comm3')]); rows.push(['공동체','리더십',get('comm4')]);
+      rows.push([]); rows.push(['프로파일별 총점(100)']);
+      Object.entries(profiles).forEach(([name,w])=>{ let t=0; areaMeta.forEach(m=>{ t+=(avg(nonEmptyNumbers(m.inputs))/5)*(w[m.key]/100); }); rows.push([name,Math.round(t*100)]); });
+      rows.push([]);
+      const csv = rows.map(r=>r.map(v=>{ const s=(v==null)?'':String(v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }).join(',')).join('\n');
+      const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='생활기록부_평가표_결과.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    // 저장/불러오기
+    function saveLocal(){
+      const data={ scores:Object.fromEntries(['acad1','acad2','acad3','career1','career2','career3','comm1','comm2','comm3','comm4'].map(id=>[id,byId(id).value])),
+        profile:byId('profileSelect').value, weights:profiles,
+        kh:{major:byId('khMajor')?.value, checked:[...document.querySelectorAll('#khSubjects input[type="checkbox"]:checked')].map(c=>c.value)} };
+      localStorage.setItem('sjpt_saved_v6', JSON.stringify(data)); alert('입력·가중치·과목 체크를 저장했습니다.');
+    }
+    function loadLocal(){
+      const raw=localStorage.getItem('sjpt_saved_v6'); if(!raw){alert('저장된 값이 없습니다.'); return;}
+      const d=JSON.parse(raw);
+      ['acad1','acad2','acad3','career1','career2','career3','comm1','comm2','comm3','comm4'].forEach(id=>{ if(d.scores&&d.scores[id]!==undefined) byId(id).value=d.scores[id]; });
+      if(d.weights){ Object.keys(profiles).forEach(name=>{ if(d.weights[name]) profiles[name]=d.weights[name]; }); }
+      buildWeightsEditor(); buildProfileSelect(); if(d.profile) byId('profileSelect').value=d.profile;
+      if(d.kh){ const m=byId('khMajor'); if(m){ m.value=d.kh.major||Object.keys(khRecs)[0]; renderKH(); [...document.querySelectorAll('#khSubjects input[type="checkbox"]')].forEach(ch=>{ ch.checked=d.kh.checked?.includes(ch.value)||false; }); updateKHProgress(); } }
+      recalcAll(); alert('불러오기 완료.');
+    }
+
+    function buildProfileSelect(){ const sel=byId('profileSelect'); sel.innerHTML=Object.keys(profiles).map(n=>`<option value="${n}">${n}</option>`).join(''); if(!sel.value) sel.value='서울대'; }
+
+    // 가이드북 요지 자동 채우기(요약)
+    const guideSnippets={
+      '경희대':{A:'교과 성취와 자기주도 학습, 탐구/보고서의 질을 종합', R:'전공 과목 선택·성취 + 동아리/탐구의 지속성', C:'협업과 배려, 공동체 기여의 의미와 일관성'},
+      '중앙대(융합형)':{A:'학업 비중 큼(50) — 교과 성취·태도·탐구 정밀', R:'융합적 탐구·연결성', C:'협업 및 공동체 기여 사례'},
+      '중앙대(탐구형)':{A:'기초학업 충실 + 탐구 설계·심화 논리성', R:'주제 심화·확장, 결과의 타당성', C:'역할 책임과 의사소통'},
+      '연세대':{A:'성취 수준과 성장 가능성, 탐구·사고력', R:'전공 관심과 구체적 탐색', C:'나눔·배려·협업·성실성'},
+      '이화여대':{A:'학업 충실성·지속성', R:'진로 목표와 교과·비교과 연계', C:'리더십·협업·타인 존중'},
+      '서울시립대':{A:'학업(30) 기초·기본 충실', R:'잠재(50) 전공적합+발전가능성', C:'사회(20) 공동체 기여 태도'},
+      '서울대':{A:'교과 충실성과 전공 관련 과목 이수', R:'전공 관심·탐구의 깊이', C:'성실성·책임감 등 생활 태도'}
+    };
+    function fillGuide(areaKey){ const prof=byId('profileSelect').value; const map=guideSnippets[prof]; if(!map){ alert('해당 대학 요약 없음'); return;} const targetId=areaKey==='A'?'acadGuide':areaKey==='R'?'careerGuide':'commGuide'; const cur=byId(targetId)?.value||''; byId(targetId).value=(cur?cur+' / ':'')+(map[areaKey]||''); }
+    document.addEventListener('click', (e)=>{ if(e.target.classList?.contains('btnFill')){ fillGuide(e.target.dataset.fill); } });
+
+    // 경희대 과목 체크 UI
+    function buildKH(){ const sel=byId('khMajor'); if(!sel) return; sel.innerHTML = Object.keys(khRecs).map(k=>`<option value="${k}">${k}</option>`).join(''); }
+    function renderKH(){ const key=byId('khMajor')?.value; if(!key) return; const data=khRecs[key]; const wrap=byId('khSubjects'); wrap.innerHTML='';
+      const makeChip=(name,kind)=>`<label class="inline-flex items-center gap-1 text-xs ${kind==='core'?'bg-red-100 text-red-700 border-red-300':'bg-sky-100 text-sky-700 border-sky-300'} border rounded-full px-2 py-1"><input type="checkbox" value="${name}"><span>${name}</span>${kind==='core'?'<span class="ml-1">(핵심)</span>':'<span class="ml-1">(권장)</span>'}</label>`;
+      wrap.innerHTML = data.core.map(n=>makeChip(n,'core')).join(' ')+ ' ' + (data.rec||[]).map(n=>makeChip(n,'rec')).join(' ');
+      wrap.querySelectorAll('input[type="checkbox"]').forEach(ch=> ch.addEventListener('change', updateKHProgress));
+      updateKHProgress();
+    }
+    function updateKHProgress(){ const key=byId('khMajor')?.value; if(!key) return; const data=khRecs[key]; const total=(data.core?.length||0)+(data.rec?.length||0); const checked=[...document.querySelectorAll('#khSubjects input[type="checkbox"]:checked')];
+      const coreHit = checked.filter(c=>data.core.includes(c.value)).length; const recHit = checked.filter(c=>data.rec?.includes(c.value)).length; const pct = total? Math.round((checked.length/total)*100):0;
+      byId('khProgress').innerHTML = `핵심 이수 <strong>${coreHit}/${data.core.length}</strong>, 권장 이수 <strong>${recHit}/${data.rec?.length||0}</strong> → 전체 체크율 <strong>${pct}%</strong>`;
+    }
+
+    // ===== 초기화 =====
+    function init(){
+      ['acad1','acad2','acad3','career1','career2','career3','comm1','comm2','comm3','comm4'].forEach(id=>buildScoreOptions(byId(id)));
+      buildProfileSelect(); renderWeightsSummary(byId('profileSelect').value); renderAreas(); renderCompareAll();
+      ['acad1','acad2','acad3','career1','career2','career3','comm1','comm2','comm3','comm4'].forEach(id=>byId(id).addEventListener('change', recalcAll));
+      byId('profileSelect').addEventListener('change', ()=>{ renderWeightsSummary(byId('profileSelect').value); calcSelectedTotal(); });
+      byId('toggleWeights').addEventListener('click', ()=>{ buildWeightsEditor(); byId('weightsPanel').classList.toggle('hidden'); });
+      byId('btnWeightsClose')?.addEventListener('click', ()=>byId('weightsPanel').classList.add('hidden'));
+      byId('btnWeightsSave')?.addEventListener('click', ()=>{ renderWeightsSummary(byId('profileSelect').value); recalcAll(); alert('가중치를 저장했습니다.'); });
+      byId('btnExportCSV')?.addEventListener('click', exportCSV);
+      byId('btnPrint')?.addEventListener('click', ()=>window.print());
+      byId('btnReset')?.addEventListener('click', ()=>{ ['acad1','acad2','acad3','career1','career2','career3','comm1','comm2','comm3','comm4','acadNote','careerNote','commNote','acadGuide','careerGuide','commGuide'].forEach(id=>{ const el=byId(id); if(el) el.value=''; });
+        [...document.querySelectorAll('#khSubjects input[type="checkbox"]')].forEach(ch=>ch.checked=false); updateKHProgress();
+        recalcAll();
+      });
+      byId('btnSave')?.addEventListener('click', saveLocal);
+      byId('btnLoad')?.addEventListener('click', loadLocal);
+      buildKH(); byId('khMajor')?.addEventListener('change', renderKH); renderKH();
+      recalcAll();
+    }
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
